@@ -1,0 +1,25 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.js",
+    "**/*.jsx",
+    ".expo/types/**/*.js",
+    "expo-env.d.js",
+    "hooks/useThemeColor.jsx",
+    "hooks/useColorScheme.web.jsx",
+    "hooks/useColorScheme.jsx",
+    "constants/Colors.jsx",
+    "components/ThemedView.jsx",
+    "components/ThemedText.jsx",
+    "assets/**/*", // Include assets directory (images, fonts, etc.)
+    "assets/icons/*", // Include icons directory
+  ]
+}
