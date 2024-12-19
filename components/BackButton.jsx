@@ -1,7 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import ScreenWrapper from "./ScreenWrapper";
-import { StatusBar } from "expo-status-bar";
 import Icon from "@/assets/icons";
 import { colorStyle, radius } from "@/constants/Colors";
 

@@ -34,7 +34,7 @@ const Button = ({
   if (loading) {
     return (
       <ThemedView
-        style={[styles.button, buttonStyle, { backgroundColor: "white" }]}
+        style={[styles.button, buttonStyle, { backgroundColor: "transparent" }]}
       >
         <Loading />
       </ThemedView>

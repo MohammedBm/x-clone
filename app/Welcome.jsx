@@ -10,14 +10,16 @@ import WelcomeSVG from "@/assets/images/WelcomeSVG";
 import { Colors, colorStyle, fonts } from "@/constants/Colors";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
+import { useTheme } from "@/hooks/ThemeContext";
 
 const Welcome = () => {
+  const { theme } = useTheme();
   const backgroundColor = useThemeColor({}, "background");
   const router = useRouter();
   // theme color
   return (
     <ScreenWrapper bg={backgroundColor}>
-      <StatusBar style="auto" />
+      <StatusBar style={theme === "light" ? "dark" : "light"} />
 
       <ThemedView style={styles.container}>
         <WelcomeSVG
@@ -48,14 +50,14 @@ const Welcome = () => {
               marginHorizontal: wp(3),
             }}
             onPress={() => {
-              router.push("Signup");
+              router.push("signup");
             }}
           />
           <View style={styles.bottomTextContainer}>
             <ThemedText>Already have an account?</ThemedText>
             <Pressable
               onPress={() => {
-                router.push("Login");
+                router.push("login");
               }}
             >
               <ThemedText style={styles.loginText}>Login!</ThemedText>
@@ -103,6 +105,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: colorStyle.primary,
     fontSize: hp(2),
-    fontWeight: fonts.bold,
+    fontWeight: fonts.semiBold,
   },
 });

@@ -4,18 +4,14 @@ import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { router } from "expo-router";
 import { useTheme } from "@/hooks/ThemeContext";
+import Loading from "@/components/Loading";
 
 const Index = () => {
-  const { theme, toggleTheme } = useTheme();
-
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.text}>Hello, world!</ThemedText>
-      <Button title="To Welcome" onPress={() => router.push("Welcome")} />
-      <Button
-        title={`Current Theme: ${theme}. Toggle Theme`}
-        onPress={toggleTheme}
-      />
+    <ThemedView
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+    >
+      <Loading />
     </ThemedView>
   );
 };
