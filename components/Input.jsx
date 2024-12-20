@@ -8,7 +8,7 @@ const Input = (props) => {
   const { theme } = useTheme();
   return (
     <View
-      style={[styles.container, props.containerStyles && props.containerStyles]}
+      style={[styles.container, props.containerStyle && props.containerStyle]}
     >
       {props.icon && props.icon}
       <TextInput
