@@ -40,7 +40,9 @@ export const fetchPosts = async (limit = 10, offset = 0) => {
   try {
     const { data, error } = await supabase
       .from("posts")
-      .select(`*, user: users (id, name, image)`)
+      .select(`*, user: users (id, name, image),
+          postsLikes (*)
+        `)
       .range(offset, offset + limit - 1) // Fetch a range of posts using offset and limit
       .order("created_at", { ascending: false });
 
@@ -52,6 +54,71 @@ export const fetchPosts = async (limit = 10, offset = 0) => {
     return { success: true, data };
   } catch (error) {
     console.log("Error fetching posts: ", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const createPostLike = async (postLike) => {
+  try {
+    const { data, error } = await supabase
+      .from("postsLikes")
+      .insert(postLike)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Post like error: ", error);
+      return { success: false, error: 'Could not like post' };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.log("Error fetching posts: ", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const removePostLike = async (postId, userId) => {
+  try {
+    const { error } = await supabase
+      .from("postsLikes")
+      .delete()
+      .eq("userId", userId)
+      .eq("postId", postId)
+
+
+    if (error) {
+      console.error("Could not remove like: ", error);
+      return { success: false, error: 'Could not remove like' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.log("Error fetching posts: ", error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const fetchPostDetails = async (postId) => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`
+        *, 
+        user: users (id, name, image),
+        postsLikes (*)
+      `)
+      .eq("id", postId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching post: ", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.log("Error fetching post: ", error);
     return { success: false, error: error.message };
   }
 };

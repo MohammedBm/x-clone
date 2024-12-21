@@ -19,7 +19,7 @@ const Welcome = () => {
   // theme color
   return (
     <ScreenWrapper bg={backgroundColor}>
-      <StatusBar style={theme === "light" ? "dark" : "light"} />
+      <StatusBar style={theme === "light" ? "dark" : "dark"} />
 
       <ThemedView style={styles.container}>
         <WelcomeSVG

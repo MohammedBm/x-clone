@@ -37,7 +37,7 @@ const Home = () => {
   };
 
   const getPosts = async () => {
-    if (loading || !hasMore) return; // Prevent multiple or unnecessary fetches
+    if (loading || !hasMore) return;
     setLoading(true);
 
     console.log(
@@ -47,22 +47,18 @@ const Home = () => {
       POSTS_LIMIT
     );
 
-    // Fetch posts with offset and limit
     let res = await fetchPosts(POSTS_LIMIT, offset);
     if (res.success) {
       const newPosts = res.data;
 
       if (newPosts.length > 0) {
-        // Append new posts to the existing list
         setPosts((prevPosts) => [...prevPosts, ...newPosts]);
 
-        // Increment offset for the next fetch
         setOffset((prevOffset) => prevOffset + POSTS_LIMIT);
       }
 
-      // Check if we've reached the end of the posts
       if (newPosts.length < POSTS_LIMIT) {
-        setHasMore(false); // No more posts to fetch
+        setHasMore(false);
       }
     } else {
       console.error("Error fetching posts:", res.error);
@@ -80,8 +76,6 @@ const Home = () => {
         handlePostEvents
       )
       .subscribe();
-
-    getPosts(); // Initial fetch
 
     return () => {
       supabase.removeSubscription(postChannel);
@@ -141,7 +135,15 @@ const Home = () => {
             contentContainerStyle={styles.listStyle}
             onEndReached={getPosts}
             onEndReachedThreshold={0.5}
-            ListFooterComponent={loading && <Loading />}
+            ListFooterComponent={
+              hasMore ? (
+                <Loading />
+              ) : (
+                <ThemedText style={{ textAlign: "center", padding: 10 }}>
+                  No more posts to show
+                </ThemedText>
+              )
+            }
           />
         </View>
       </View>

@@ -17,5 +17,6 @@ const styles = StyleSheet.create({
   loading: {
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "transparent",
   },
 });

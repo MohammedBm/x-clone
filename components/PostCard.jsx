@@ -1,28 +1,48 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import {
+  Platform,
+  Share,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { colorStyle, fonts, radius } from "@/constants/Colors";
 import { hp } from "@/helpers/common";
 import Avatar from "./Avatar";
-import {
-  formatDistanceToNowStrict,
-  formatDistanceStrict,
-  parseISO,
-} from "date-fns";
+import { formatDistanceToNowStrict, parseISO, set } from "date-fns";
 import Icon from "@/assets/icons";
 import { getSupabaseUrl } from "@/services/imageService";
 import { Image } from "expo-image";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEvent } from "expo";
+import { createPostLike, removePostLike } from "@/services/PostService";
+import { useRouter } from "expo-router";
 
-const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
+const PostCard = ({
+  item,
+  currentUser,
+  router,
+  hasShadow = true,
+  showMoreIcons = true,
+}) => {
   const shadowStyles = {
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.09,
     shadowRadius: 6.5,
     elevation: 1,
+  };
+  const [likes, setLikes] = useState([]);
+  useEffect(() => {
+    setLikes(item?.postsLikes);
+  }, []);
+
+  const openDetails = () => {
+    if (!showMoreIcons) return null;
+    router.push({ pathname: "postDetails", params: { postId: item?.id } });
   };
 
   const formatTimeDifference = (timestamp) => {
@@ -34,7 +54,7 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
     return timeDifference;
   };
 
-  const player = useVideoPlayer(getSupabaseUrl(item.file), (player) => {
+  const player = useVideoPlayer(getSupabaseUrl(item?.file), (player) => {
     player.loop = false;
   });
 
@@ -42,41 +62,69 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
     isPlaying: player.playing,
   });
 
-  const liked = true;
-  const likes = [];
+  const onLike = async () => {
+    if (liked) {
+      let updatedLikes = likes.filter(
+        (like) => like.userId !== currentUser?.id
+      );
+      setLikes([...updatedLikes]);
+      let res = await removePostLike(item?.id, currentUser?.id);
+      console.log("removed like", res);
+      if (!res.success) {
+        console.log("Error removing like: ", res.error);
+      }
+    } else {
+      let data = {
+        userId: currentUser?.id,
+        postId: item?.id,
+      };
+      setLikes([...likes, data]);
+      let res = await createPostLike(data);
+
+      if (!res.success) {
+        console.log("Error liking post: ", res.error);
+      }
+    }
+  };
+
+  const liked = likes?.filter((like) => like.userId == currentUser?.id)[0]
+    ? true
+    : false;
+
   return (
     <View style={[styles.container, hasShadow && shadowStyles]}>
       <View style={styles.header}>
         {/* user info */}
         <View style={styles.userInfo}>
-          <Avatar size={hp(4)} img={item.user.image} />
+          <Avatar size={hp(4)} img={item?.user.image} />
           <View style={{ gap: 2 }}>
-            <Text style={styles.username}>{item.user.name}</Text>
+            <Text style={styles.username}>{item?.user.name}</Text>
             <Text style={styles.postTime}>
-              {formatTimeDifference(item.created_at)}
+              {formatTimeDifference(item?.created_at)}
             </Text>
           </View>
         </View>
-
-        <TouchableOpacity>
-          <Icon
-            name="threeDotsHorizontal"
-            size={hp(3.5)}
-            strokeWidth={3}
-            color={colorStyle.textDark}
-          />
-        </TouchableOpacity>
+        {showMoreIcons && (
+          <TouchableOpacity onPress={openDetails}>
+            <Icon
+              name="threeDotsHorizontal"
+              size={hp(3.5)}
+              strokeWidth={3}
+              color={colorStyle.textDark}
+            />
+          </TouchableOpacity>
+        )}
       </View>
       {/* posts body  */}
       <View style={styles.content}>
         <View style={styles.postBody}>
-          <Text style={{}}>{item.body}</Text>
+          <Text style={{}}>{item?.body}</Text>
         </View>
 
         {/* image */}
         {item?.file && item?.file?.includes("postImages") && (
           <Image
-            source={getSupabaseUrl(item.file)}
+            source={getSupabaseUrl(item?.file)}
             style={styles.postMedia}
             content="cover"
           />
@@ -98,10 +146,10 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
       {/* footer */}
       <View style={styles.footer}>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onLike}>
             <Icon
-              name="heart"
               size={24}
+              name="heart"
               fill={liked ? colorStyle.primary : "transparent"}
               color={liked ? colorStyle.primary : colorStyle.textLight}
             />
@@ -109,15 +157,10 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
           <Text style={styles.count}>{likes?.length}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openDetails}>
             <Icon name="comment" size={24} color={colorStyle.textLight} />
           </TouchableOpacity>
           <Text style={styles.count}>{likes?.length}</Text>
-        </View>
-        <View style={styles.footerButton}>
-          <TouchableOpacity>
-            <Icon name="share" size={24} color={colorStyle.textLight} />
-          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -135,7 +178,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingVertical: 12,
     backgroundColor: "white",
-    borderWidth: 0.5,
+    borderBottomWidth: 0.5,
     borderColor: colorStyle.gray,
     shadowColor: "#000",
   },
