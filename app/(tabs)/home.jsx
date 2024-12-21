@@ -51,7 +51,7 @@ const Home = () => {
               }}
             >
               <Avatar
-                img={user?.avatar}
+                img={user?.image}
                 size={hp(4.3)}
                 rounded={radius.sm}
                 style={{ borderWidth: 2 }}

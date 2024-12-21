@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 5,
     borderRadius: radius.sm,
-    backgroundColor: "$feee2e2",
+    backgroundColor: "#fee2e2",
   },
   listStyle: {
     paddingHorizontal: wp(4),

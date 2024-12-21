@@ -7,13 +7,14 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import Header from "@/components/Header";
 import { Image } from "expo-image";
 import { useAuth } from "@/context/AuthContext";
-import { getUserImageSrc } from "@/services/imageService";
+import { getUserImageSrc, uploadFile } from "@/services/imageService";
 import Icon from "@/assets/icons";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import Toast from "react-native-toast-message";
 import { updateUserData } from "@/services/userService";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 
 const EditProfile = () => {
   const backgroundColor = useThemeColor({}, "background");
@@ -40,14 +41,23 @@ const EditProfile = () => {
     }
   }, [currentUser]);
 
-  const onPickImage = () => {
-    console.log("pick image");
+  const onPickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.5,
+    });
+
+    if (!result.cancelled) {
+      setUser({ ...user, image: result.assets[0] });
+    }
   };
 
   const onSubmit = async () => {
     let userData = { ...user };
     let { name, bio, phoneNumber, address, image } = userData;
-    if (!name || !bio || !phoneNumber || !address) {
+    if (!name || !bio || !phoneNumber || !address || !image) {
       Toast.show({
         type: "error",
         text1: "🔥 Error",
@@ -56,6 +66,12 @@ const EditProfile = () => {
       return;
     }
     setLoading(true);
+
+    if (typeof image == "object") {
+      let imageRes = await uploadFile("profiles", image?.uri);
+      if (imageRes.success) userData.image = imageRes.data;
+      else userData.image = null;
+    }
 
     const res = await updateUserData(currentUser?.id, userData);
     setLoading(false);
@@ -71,7 +87,11 @@ const EditProfile = () => {
     }
   };
 
-  let imageSource = getUserImageSrc(currentUser?.image);
+  let imageSource =
+    user.image && typeof user.image == "object"
+      ? user.image.uri
+      : getUserImageSrc(currentUser?.image);
+
   return (
     <ScreenWrapper bg={backgroundColor}>
       <View style={styles.container}>
@@ -101,6 +121,7 @@ const EditProfile = () => {
               placeholder="Enter your phone number"
               onChangeText={(text) => setUser({ ...user, phoneNumber: text })}
               value={user.phoneNumber}
+              keyboardType="phone-pad"
             />
 
             <Input

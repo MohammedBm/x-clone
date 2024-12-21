@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 5,
     gap: 10,
+    backgroundColor: "transparent",
   },
   title: {
     fontSize: hp(2.7),
