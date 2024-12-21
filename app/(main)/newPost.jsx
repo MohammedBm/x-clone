@@ -82,6 +82,7 @@ const NewPost = () => {
       bodyRef.current = "";
       router.back();
     } else {
+      console.log("Error creating post: ", res.error);
       Toast.show({
         type: "error",
         text1: "🚫 Error",
@@ -254,8 +255,9 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   addImageText: {
-    fontSize: hp(2),
-    fontWeight: fonts.semiBold,
+    ontSize: hp(1.7),
+    fontWeight: fonts.medium,
+    color: colorStyle.textLight,
   },
   imageIcon: {
     borderRadius: radius.md,

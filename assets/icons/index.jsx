@@ -22,6 +22,7 @@ import Logout from "./logout";
 import Image from "./Image";
 import Video from "./Video";
 import { colorStyle } from "@/constants/Colors";
+import HideKeyboard from "./HideKeyboard";
 
 const icons = {
   home: Home,
@@ -45,6 +46,7 @@ const icons = {
   logout: Logout,
   image: Image,
   video: Video,
+  hideKeyboard: HideKeyboard,
 };
 
 const Icon = ({ name, ...props }) => {

@@ -1,3 +1,4 @@
+import Icon from "@/assets/icons";
 import { colorStyle } from "@/constants/Colors";
 import React, { useState, useRef } from "react";
 import {
@@ -7,6 +8,8 @@ import {
   ScrollView,
   Text,
   Platform,
+  TouchableOpacity,
+  Keyboard,
 } from "react-native";
 
 const RichTextEditor = ({ onChange, placeholder }) => {
@@ -23,21 +26,37 @@ const RichTextEditor = ({ onChange, placeholder }) => {
     }
   };
 
+  const hideKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
     <ScrollView
       contentContainerStyle={styles.scrollView}
       keyboardShouldPersistTaps="handled"
     >
       <View style={styles.container}>
-        <TextInput
-          ref={inputRef}
-          multiline
-          style={styles.inputContainer}
-          placeholder={placeholder}
-          value={text} // Bind the TextInput value to the state
-          onChangeText={handleTextChange} // Handle text change
-          textAlignVertical="top"
-        />
+        <View style={styles.inputBorder}>
+          <TextInput
+            ref={inputRef}
+            multiline
+            style={styles.inputContainer}
+            placeholder={placeholder}
+            placeholderTextColor={colorStyle.textLight}
+            value={text}
+            onChangeText={handleTextChange}
+            textAlignVertical="top"
+          />
+        </View>
+        {/* Keyboard close button */}
+        {Platform.OS !== "web" && (
+          <TouchableOpacity
+            onPress={hideKeyboard}
+            style={styles.keyboardCloseButton}
+          >
+            <Icon name="hideKeyboard" size={24} fill={colorStyle.primary} />
+          </TouchableOpacity>
+        )}
         <View style={styles.wordCountContainer}>
           <Text
             style={styles.wordCountText}
@@ -60,14 +79,16 @@ const styles = StyleSheet.create({
     paddingBottom: 10, // Ensure content is scrollable
   },
   inputContainer: {
-    borderWidth: 1,
-    borderColor: colorStyle.primary,
-    borderRadius: 10,
     padding: 10,
     minHeight: 200,
     maxHeight: 200, // Set the max height to 400
     textAlignVertical: "top",
     overflow: "auto", // Allow the text to scroll when it's too long
+  },
+  inputBorder: {
+    borderWidth: 1,
+    borderColor: colorStyle.primary,
+    borderRadius: 10,
   },
   wordCountContainer: {
     padding: 5,
@@ -76,5 +97,11 @@ const styles = StyleSheet.create({
   wordCountText: {
     fontSize: 12,
     color: "#888",
+  },
+  keyboardCloseButton: {
+    position: "absolute",
+    right: 10,
+    // sit at the bottom
+    bottom: 40,
   },
 });

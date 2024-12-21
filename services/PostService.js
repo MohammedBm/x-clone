@@ -30,5 +30,28 @@ export const createOrUpdatePost = async (post) => {
     return { success: true, data }
   } catch (error) {
     console.error("Error creating post: ", error);
+    return {
+      success: false, error: error.message
+    }
   }
 }
+
+export const fetchPosts = async (limit = 10, offset = 0) => {
+  try {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`*, user: users (id, name, image)`)
+      .range(offset, offset + limit - 1) // Fetch a range of posts using offset and limit
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching posts: ", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.log("Error fetching posts: ", error);
+    return { success: false, error: error.message };
+  }
+};
