@@ -1,5 +1,6 @@
 import {
   Alert,
+  FlatList,
   Platform,
   Pressable,
   StyleSheet,
@@ -7,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useRouter } from "expo-router";
@@ -19,13 +20,24 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import Avatar from "@/components/Avatar";
 import { ThemedText } from "@/components/ThemedText";
+import alert from "@/components/alert";
+import { fetchPosts } from "@/services/PostService";
+import Loading from "@/components/Loading";
+import PostCard from "@/components/PostCard";
+
+const POSTS_LIMIT = 10; // Ensure posts limit is defined
+let LIMIT = 0;
 
 const Profile = () => {
   const backgroundColor = useThemeColor({}, "background");
   const router = useRouter();
   const { user, setAuth } = useAuth();
+  const [offset, setOffset] = useState(0);
+  const [posts, setPosts] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-  const logOutHandler = async () => {
+  const logout = async () => {
     setAuth(null);
 
     const { error } = await supabase.auth.signOut();
@@ -33,9 +45,108 @@ const Profile = () => {
     console.log("error", error);
   };
 
+  const handleLogout = () => {
+    alert("Logout", "Are you sure you want to logout?", [
+      {
+        text: "Delete",
+        onPress: logout,
+        style: "destructive",
+      },
+      {
+        text: "Cancel",
+        onPress: () => {
+          console.log("Cancel delete");
+        },
+        style: "cancel",
+      },
+    ]);
+  };
+
+  const getPosts = async () => {
+    if (loading || !hasMore) return; // Avoid duplicate calls when already loading or no more posts
+    setLoading(true); // Start loading state
+
+    try {
+      let res = await fetchPosts(POSTS_LIMIT, offset, user.id);
+      if (res.success) {
+        const newPosts = res.data;
+        if (newPosts.length > 0) {
+          // For each post, fetch the comment count directly from the `comments` table
+          const postsWithCommentCounts = await Promise.all(
+            newPosts.map(async (post) => {
+              const { data: commentCountData, error } = await supabase
+                .from("comments")
+                .select("count")
+                .eq("postId", post.id)
+                .single();
+
+              if (error) {
+                console.error("Error fetching comment count:", error);
+                post.commentCount = 0;
+              } else {
+                post.commentCount = commentCountData?.count || 0;
+              }
+              return post;
+            })
+          );
+          setPosts((prevPosts) => [...prevPosts, ...postsWithCommentCounts]);
+          setOffset((prevOffset) => prevOffset + POSTS_LIMIT);
+        }
+        if (newPosts.length < POSTS_LIMIT) {
+          setHasMore(false);
+        }
+      } else {
+        console.error("Error fetching posts:", res.error);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      setLoading(false); // Always reset loading state, even in case of error
+    }
+  };
+
+  console.log("posts", posts);
+
   return (
     <ScreenWrapper bg={backgroundColor}>
-      <UserHeader router={router} user={user} logoutHandler={logOutHandler} />
+      <FlatList
+        ItemSeparatorComponent={() => (
+          <View
+            style={{ borderBottomWidth: 1, borderColor: colorStyle.gray }}
+          />
+        )}
+        ListHeaderComponent={
+          <UserHeader
+            router={router}
+            user={user}
+            logoutHandler={handleLogout}
+          />
+        }
+        ListHeaderComponentStyle={{ marginBottom: 30 }}
+        data={posts}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <PostCard item={item} currentUser={user} router={router} />
+        )}
+        contentContainerStyle={styles.listStyle}
+        onEndReached={getPosts}
+        onEndReachedThreshold={0.3} // Trigger earlier when nearing the bottom
+        ListFooterComponent={
+          hasMore ? (
+            <View
+              style={{
+                marginVertical: posts.length == 0 ? 100 : 30,
+              }}
+            >
+              <Loading />
+            </View>
+          ) : (
+            <ThemedText style={{ textAlign: "center", padding: 10 }}>
+              No more posts to show
+            </ThemedText>
+          )
+        }
+      />
     </ScreenWrapper>
   );
 };
@@ -154,7 +265,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fee2e2",
   },
   listStyle: {
-    paddingHorizontal: wp(4),
     paddingBottom: 30,
   },
   noPosts: {

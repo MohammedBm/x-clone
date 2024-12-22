@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -18,7 +18,7 @@ import { colorStyle, fonts, radius } from "@/constants/Colors";
 import Avatar from "@/components/Avatar";
 import { useAuth } from "@/context/AuthContext";
 import RichTextEditor from "@/components/RichTextEditor";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Icon from "@/assets/icons";
 import Button from "@/components/Button";
 import * as ImagePicker from "expo-image-picker";
@@ -31,6 +31,7 @@ import Toast from "react-native-toast-message";
 import { createOrUpdatePost } from "@/services/PostService";
 
 const NewPost = () => {
+  const post = useLocalSearchParams();
   const bgColor = useThemeColor({}, "background");
   const { user } = useAuth();
 
@@ -39,6 +40,14 @@ const NewPost = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (post && post.id) {
+      bodyRef.current = post.body;
+      editorRef.current?.setContent(post.body);
+      setFile(post.file || null);
+    }
+  }, []);
 
   const onPick = async (mediaType) => {
     let mediaConfig = {
@@ -73,6 +82,8 @@ const NewPost = () => {
       userId: user.id,
     };
 
+    if (post && post.id) data.id = post.id;
+
     //  create post
     setLoading(true);
     let res = await createOrUpdatePost(data);
@@ -81,6 +92,10 @@ const NewPost = () => {
       setFile(null);
       bodyRef.current = "";
       router.back();
+      Toast.show({
+        type: "success",
+        text1: `🚀 Post ${post && post.id ? "updated" : "created"}`,
+      });
     } else {
       console.log("Error creating post: ", res.error);
       Toast.show({
@@ -116,7 +131,7 @@ const NewPost = () => {
       return file.uri;
     }
 
-    return getSupabaseUrl(file).uri;
+    return getSupabaseUrl(file)?.uri || getSupabaseUrl(file);
   };
 
   const player = useVideoPlayer(getFileUri(file), (player) => {
@@ -145,6 +160,7 @@ const NewPost = () => {
           <View style={styles.textEditor}>
             <RichTextEditor
               ref={editorRef}
+              bodyRef={bodyRef}
               onChange={(body) => (bodyRef.current = body)}
               placeholder="What's on your mind?"
             />
@@ -191,7 +207,7 @@ const NewPost = () => {
         </ScrollView>
         <Button
           buttonStyle={{ height: hp(6) }}
-          title="Post"
+          title={post && post.id ? "Update" : "Post"}
           loading={loading}
           hasShadow={false}
           onPress={onPost}

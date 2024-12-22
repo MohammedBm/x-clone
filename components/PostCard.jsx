@@ -16,8 +16,10 @@ import { getSupabaseUrl } from "@/services/imageService";
 import { Image } from "expo-image";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEvent } from "expo";
-import { createPostLike, removePostLike } from "@/services/PostService";
+import { createPostLike, deletePostLike } from "@/services/PostService";
 import { useRouter } from "expo-router";
+import { Pencil, Trash2 } from "lucide-react-native";
+import alert from "./alert";
 
 const PostCard = ({
   item,
@@ -25,19 +27,14 @@ const PostCard = ({
   router,
   hasShadow = true,
   showMoreIcons = true,
+  showDelete = false,
+  onDelete = () => {},
+  onEdit = () => {},
 }) => {
-  const shadowStyles = {
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.09,
-    shadowRadius: 6.5,
-    elevation: 1,
-  };
+  console.log(item);
   const [likes, setLikes] = useState([]);
   useEffect(() => {
-    setLikes(item?.postsLikes);
+    setLikes(item?.postsLikes || []);
   }, []);
 
   const openDetails = () => {
@@ -68,7 +65,7 @@ const PostCard = ({
         (like) => like.userId !== currentUser?.id
       );
       setLikes([...updatedLikes]);
-      let res = await removePostLike(item?.id, currentUser?.id);
+      let res = await deletePostLike(item?.id, currentUser?.id);
       console.log("removed like", res);
       if (!res.success) {
         console.log("Error removing like: ", res.error);
@@ -87,12 +84,31 @@ const PostCard = ({
     }
   };
 
+  const handleDelete = () => {
+    alert("Delete Post", "Are you sure you want to delete this post?", [
+      {
+        text: "Delete",
+        onPress: () => {
+          onDelete(item);
+        },
+        style: "destructive",
+      },
+      {
+        text: "Cancel",
+        onPress: () => {
+          console.log("Cancel delete");
+        },
+        style: "cancel",
+      },
+    ]);
+  };
+
   const liked = likes?.filter((like) => like.userId == currentUser?.id)[0]
     ? true
     : false;
 
   return (
-    <View style={[styles.container, hasShadow && shadowStyles]}>
+    <View style={[styles.container]}>
       <View style={styles.header}>
         {/* user info */}
         <View style={styles.userInfo}>
@@ -114,6 +130,17 @@ const PostCard = ({
             />
           </TouchableOpacity>
         )}
+
+        {showDelete && currentUser.id == item?.userId && (
+          <View style={styles.actions}>
+            <TouchableOpacity onPress={() => onEdit(item)}>
+              <Pencil size={20} color={colorStyle.primary} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleDelete}>
+              <Trash2 size={20} color={colorStyle.rose} />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
       {/* posts body  */}
       <View style={styles.content}>
@@ -126,7 +153,7 @@ const PostCard = ({
           <Image
             source={getSupabaseUrl(item?.file)}
             style={styles.postMedia}
-            content="cover"
+            contentFit="scale-down"
           />
         )}
 
@@ -160,7 +187,7 @@ const PostCard = ({
           <TouchableOpacity onPress={openDetails}>
             <Icon name="comment" size={24} color={colorStyle.textLight} />
           </TouchableOpacity>
-          <Text style={styles.count}>{likes?.length}</Text>
+          <Text style={styles.count}>{item.commentCount || 0}</Text>
         </View>
       </View>
     </View>
@@ -178,9 +205,6 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingVertical: 12,
     backgroundColor: "white",
-    borderBottomWidth: 0.5,
-    borderColor: colorStyle.gray,
-    shadowColor: "#000",
   },
   header: {
     flexDirection: "row",
@@ -209,6 +233,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: radius.xl,
     borderCurve: "continuous",
+    backgroundColor: "black",
   },
   postBody: {
     marginLeft: 5,

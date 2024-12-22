@@ -72,5 +72,24 @@ export const updateUserData = async (userId, data) => {
     };
 
   }
+}
 
+export const fetchUsersData = async () => {
+  try {
+    const { data, error } = await supabase.from('users').select();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+    return {
+      success: true, data
+    };
+
+  } catch (error) {
+    console.log("error", error);
+    return {
+      success: false, msg: error.message
+    };
+
+  }
 }

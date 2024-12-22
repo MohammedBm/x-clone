@@ -27,32 +27,97 @@ const Home = () => {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  // Handle post events (Insert, Update, Delete)
   const handlePostEvents = async (payload) => {
     if (payload.eventType === "INSERT" && payload?.new?.id) {
       let newPost = { ...payload.new };
       let res = await getUserData(newPost.userId);
+
+      newPost.user = res.success ? res.data : {};
+      newPost.comments = [];
+      newPost.postLikes = [];
       newPost.user = res.success ? res.data : {};
       setPosts((prev) => [newPost, ...prev]);
     }
+    if (payload.eventType === "DELETE") {
+      setPosts((prevPosts) =>
+        prevPosts.filter((post) => post.id !== payload.old.id)
+      );
+    }
+
+    if (payload.eventType === "UPDATE" && payload?.new?.id) {
+      setPosts((prev) => {
+        let updatedPost = prev.map((post) => {
+          if (post.id === payload.new.id) {
+            post.body = payload.new.body;
+            post.file = payload.new.file;
+          }
+          return post;
+        });
+
+        return updatedPost;
+      });
+    }
   };
 
+  // Handle comment events (Insert)
+  const handleCommentEvents = (payload) => {
+    if (payload?.new?.postId) {
+      const postId = payload.new.postId;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? { ...post, commentCount: (post.commentCount || 0) + 1 }
+            : post
+        )
+      );
+    }
+  };
+
+  // Handle like events (Insert, Update, Delete)
+  const handleLikeEvents = async (payload) => {
+    if (payload?.new?.postId) {
+      const postId = payload.new.postId;
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? { ...post, likeCount: (post.likeCount || 0) + 1 } // Increment like count
+            : post
+        )
+      );
+    }
+  };
+
+  // Fetch posts from the server
   const getPosts = async () => {
     if (loading || !hasMore) return;
     setLoading(true);
-
-    console.log(
-      "Fetching posts with offset:",
-      offset,
-      "and limit:",
-      POSTS_LIMIT
-    );
 
     let res = await fetchPosts(POSTS_LIMIT, offset);
     if (res.success) {
       const newPosts = res.data;
 
       if (newPosts.length > 0) {
-        setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+        // For each post, fetch the comment count directly from the `comments` table
+        const postsWithCommentCounts = await Promise.all(
+          newPosts.map(async (post) => {
+            const { data: commentCountData, error } = await supabase
+              .from("comments")
+              .select("count")
+              .eq("postId", post.id)
+              .single();
+
+            if (error) {
+              console.error("Error fetching comment count:", error);
+              post.commentCount = 0;
+            } else {
+              post.commentCount = commentCountData?.count || 0;
+            }
+            return post;
+          })
+        );
+
+        setPosts((prevPosts) => [...prevPosts, ...postsWithCommentCounts]);
 
         setOffset((prevOffset) => prevOffset + POSTS_LIMIT);
       }
@@ -68,6 +133,7 @@ const Home = () => {
   };
 
   useEffect(() => {
+    // Subscribe to posts table
     let postChannel = supabase
       .channel("posts")
       .on(
@@ -77,8 +143,19 @@ const Home = () => {
       )
       .subscribe();
 
+    // Subscribe to comments table
+    let commentChannel = supabase
+      .channel("comments")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "comments" },
+        handleCommentEvents
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeSubscription(postChannel);
+      supabase.removeChannel(postChannel);
+      supabase.removeChannel(commentChannel);
     };
   }, []);
 
@@ -127,6 +204,14 @@ const Home = () => {
         {/* POSTS */}
         <View style={styles.listContainer}>
           <FlatList
+            ItemSeparatorComponent={() => (
+              <View
+                style={{
+                  borderColor: colorStyle.gray,
+                  borderBottomWidth: 1,
+                }}
+              />
+            )}
             data={posts}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
@@ -181,6 +266,5 @@ const styles = StyleSheet.create({
   },
   listStyle: {
     paddingTop: 20,
-    paddingHorizontal: wp(4),
   },
 });

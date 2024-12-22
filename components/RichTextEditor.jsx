@@ -12,7 +12,7 @@ import {
   Keyboard,
 } from "react-native";
 
-const RichTextEditor = ({ onChange, placeholder }) => {
+const RichTextEditor = ({ onChange, placeholder, bodyRef }) => {
   const [charCount, setCharCount] = useState(0); // Word count state
   const [text, setText] = useState(""); // State to hold the current input text
   const inputRef = useRef(null); // Reference to the TextInput for focusing
@@ -43,7 +43,7 @@ const RichTextEditor = ({ onChange, placeholder }) => {
             style={styles.inputContainer}
             placeholder={placeholder}
             placeholderTextColor={colorStyle.textLight}
-            value={text}
+            value={text || bodyRef?.current || ""} // Use bodyRef for initial text value
             onChangeText={handleTextChange}
             textAlignVertical="top"
           />
