@@ -1,14 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import React, { useRef, useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useThemeColor } from "@/hooks/useThemeColor";
-import Home from "@/assets/icons/Home";
 import { ThemedText } from "@/components/ThemedText";
-import { useTheme } from "@/hooks/ThemeContext";
 import { colorStyle, fonts } from "@/constants/Colors";
-import Icon from "@/assets/icons";
 import { useRouter } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { ThemedView } from "@/components/ThemedView";
 import BackButton from "@/components/BackButton";
 import { hp, wp } from "@/helpers/common";
@@ -16,6 +12,7 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 import Toast from "react-native-toast-message";
 import { supabase } from "@/lib/supabase";
+import { KeySquare, Mail } from "lucide-react-native";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -91,13 +88,21 @@ const Login = () => {
             Please login to your account to continue using our {"\n"}services
           </ThemedText>
           <Input
-            icon={<Icon name="mail" size={26} strokeWidth={1.6} />}
+            icon={
+              <Mail size={26} strokeWidth={1.6} color={colorStyle.primary} />
+            }
             placeholder="Enter your email"
             onChangeText={(text) => (emailRef.current = text)} // Update email ref correctly
             keyboardType="email-address"
           />
           <Input
-            icon={<Icon name="lock" size={26} strokeWidth={1.6} />}
+            icon={
+              <KeySquare
+                size={26}
+                strokeWidth={1.6}
+                color={colorStyle.primary}
+              />
+            }
             placeholder="Enter your password"
             secureTextEntry
             onChangeText={(text) => (passwordRef.current = text)} // Update password ref correctly

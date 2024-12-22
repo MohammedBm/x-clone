@@ -1,5 +1,5 @@
-import Icon from "@/assets/icons";
 import { colorStyle } from "@/constants/Colors";
+import { KeyboardOff } from "lucide-react-native";
 import React, { useState, useRef } from "react";
 import {
   StyleSheet,
@@ -49,12 +49,12 @@ const RichTextEditor = ({ onChange, placeholder, bodyRef }) => {
           />
         </View>
         {/* Keyboard close button */}
-        {Platform.OS !== "web" && (
+        {Platform.OS == "web" && (
           <TouchableOpacity
             onPress={hideKeyboard}
             style={styles.keyboardCloseButton}
           >
-            <Icon name="hideKeyboard" size={24} fill={colorStyle.primary} />
+            <KeyboardOff size={25} color={colorStyle.primary} />
           </TouchableOpacity>
         )}
         <View style={styles.wordCountContainer}>

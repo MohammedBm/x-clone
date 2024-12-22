@@ -1,9 +1,6 @@
 import {
-  ActivityIndicator,
   Pressable,
-  StyleSheet,
-  Text,
-  View,
+  StyleSheet
 } from "react-native";
 import React from "react";
 import { ThemedView } from "./ThemedView";

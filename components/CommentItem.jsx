@@ -1,9 +1,9 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { colorStyle, fonts, radius } from "@/constants/Colors";
 import { hp } from "@/helpers/common";
 import Avatar from "./Avatar";
-import { formatDistanceToNowStrict, parseISO, set } from "date-fns";
+import { formatDistanceToNowStrict, parseISO } from "date-fns";
 import { Trash2 } from "lucide-react-native";
 import alert from "./alert";
 

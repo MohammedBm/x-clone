@@ -1,17 +1,12 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import React from "react";
-import Icon from "@/assets/icons";
 import { colorStyle, radius } from "@/constants/Colors";
+import { ChevronLeft } from "lucide-react-native";
 
 const BackButton = ({ size = 26, router }) => {
   return (
     <Pressable onPress={() => router.back()} style={styles.button}>
-      <Icon
-        name="arrowLeft"
-        strokeWidth={2.5}
-        size={size}
-        color={colorStyle.primary}
-      />
+      <ChevronLeft size={size} strokeWidth={2.5} color={colorStyle.primary} />
     </Pressable>
   );
 };

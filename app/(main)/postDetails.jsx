@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import { router, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   createComment,
   deleteComment,
@@ -19,14 +19,13 @@ import { colorStyle, fonts, radius } from "@/constants/Colors";
 import Header from "@/components/Header";
 import PostCard from "@/components/PostCard";
 import { useAuth } from "@/context/AuthContext";
-import { set } from "date-fns";
 import Loading from "@/components/Loading";
 import Input from "@/components/Input";
-import Icon from "@/assets/icons";
 import Toast from "react-native-toast-message";
 import CommentItem from "@/components/CommentItem";
 import { supabase } from "@/lib/supabase";
 import { getUserData } from "@/services/userService";
+import { SendHorizonal } from "lucide-react-native";
 
 const PostDetails = () => {
   const { postId } = useLocalSearchParams();
@@ -39,7 +38,6 @@ const PostDetails = () => {
   const [loading, setLoading] = useState(false);
 
   const handleCommentChange = async (payload) => {
-    console.log("Comment change", payload);
     if (payload.new) {
       let newComment = { ...payload.new };
       let res = await getUserData(newComment.userId);
@@ -119,7 +117,6 @@ const PostDetails = () => {
   };
 
   const onDeleteComment = async (comment) => {
-    console.log("Delete comment", comment);
     let res = await deleteComment(comment?.id);
     if (res.success) {
       setPost((prev) => {
@@ -234,7 +231,11 @@ const PostDetails = () => {
               style={styles.sendIcon}
               onPress={onSendNewComment}
             >
-              <Icon name={"send"} color={colorStyle.primary} />
+              <SendHorizonal
+                strokeWidth={1.2}
+                size={33}
+                color={colorStyle.primary}
+              />
             </TouchableOpacity>
           )}
         </View>
@@ -296,6 +297,7 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
     height: hp(6.2),
     width: hp(6.2),
+    marginTop: 5,
   },
   center: {
     flex: 1,

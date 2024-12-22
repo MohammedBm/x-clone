@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -19,8 +19,6 @@ const ViewProfile = () => {
   const backgroundColor = useThemeColor({}, "background");
   const router = useRouter();
   const { userId } = useLocalSearchParams(); // Get the userId from the query params
-  console.log(userId); // Debugging line
-
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -95,7 +93,6 @@ const ViewProfile = () => {
     setLoading(false);
   };
 
-  console.log(posts);
   if (!userId || !user) {
     return (
       <View style={{ flex: 1, marginTop: hp(25), alignItems: "center" }}>

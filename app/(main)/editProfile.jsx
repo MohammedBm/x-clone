@@ -8,13 +8,13 @@ import Header from "@/components/Header";
 import { Image } from "expo-image";
 import { useAuth } from "@/context/AuthContext";
 import { getUserImageSrc, uploadFile } from "@/services/imageService";
-import Icon from "@/assets/icons";
 import Input from "@/components/Input";
 import Button from "@/components/Button";
 import Toast from "react-native-toast-message";
 import { updateUserData } from "@/services/userService";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
+import { Camera, MapPin, Phone, UserRound } from "lucide-react-native";
 
 const EditProfile = () => {
   const backgroundColor = useThemeColor({}, "background");
@@ -103,7 +103,11 @@ const EditProfile = () => {
             <View style={styles.avatarContainer}>
               <Image source={imageSource} style={styles.avatar} />
               <Pressable style={styles.cameraIcon} onPress={onPickImage}>
-                <Icon name="camera" size={20} strokeWidth={2.5} />
+                <Camera
+                  size={20}
+                  strokeWidth={2.5}
+                  color={colorStyle.primary}
+                />
               </Pressable>
             </View>
 
@@ -111,13 +115,21 @@ const EditProfile = () => {
               Fill in the form below to update your profile
             </Text>
             <Input
-              icon={<Icon name="user" size={20} strokeWidth={2.5} />}
+              icon={
+                <UserRound
+                  size={20}
+                  strokeWidth={2.5}
+                  color={colorStyle.primary}
+                />
+              }
               placeholder="Full Name"
               onChangeText={(text) => setUser({ ...user, name: text })}
               value={user.name}
             />
             <Input
-              icon={<Icon name="call" size={20} strokeWidth={2.5} />}
+              icon={
+                <Phone size={20} strokeWidth={2.5} color={colorStyle.primary} />
+              }
               placeholder="Enter your phone number"
               onChangeText={(text) => setUser({ ...user, phoneNumber: text })}
               value={user.phoneNumber}
@@ -125,7 +137,13 @@ const EditProfile = () => {
             />
 
             <Input
-              icon={<Icon name="location" size={20} strokeWidth={2.5} />}
+              icon={
+                <MapPin
+                  size={20}
+                  strokeWidth={2.5}
+                  color={colorStyle.primary}
+                />
+              }
               placeholder="Enter your address"
               onChangeText={(text) => setUser({ ...user, address: text })}
               value={user.address}

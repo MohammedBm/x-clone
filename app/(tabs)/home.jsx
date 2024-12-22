@@ -6,7 +6,6 @@ import { ThemedText } from "@/components/ThemedText";
 import { useAuth } from "@/context/AuthContext";
 import { hp, wp } from "@/helpers/common";
 import { colorStyle, fonts, radius } from "@/constants/Colors";
-import Icon from "@/assets/icons";
 import { useRouter } from "expo-router";
 import Avatar from "@/components/Avatar";
 import { fetchPosts } from "@/services/PostService";
@@ -14,6 +13,7 @@ import PostCard from "@/components/PostCard";
 import Loading from "@/components/Loading";
 import { supabase } from "@/lib/supabase";
 import { getUserData } from "@/services/userService";
+import { SquarePlus } from "lucide-react-native";
 
 const POSTS_LIMIT = 10; // Number of posts per fetch
 
@@ -166,25 +166,8 @@ const Home = () => {
         <View style={styles.header}>
           <ThemedText style={styles.title}>Home</ThemedText>
           <View style={styles.icons}>
-            <Pressable
-              onPress={() => {
-                router.push("/notifications");
-              }}
-            >
-              <Icon
-                name="heart"
-                size={hp(3.2)}
-                strokeWidth={2}
-                color={colorStyle.primary}
-              />
-            </Pressable>
             <Pressable onPress={() => router.push("/newPost")}>
-              <Icon
-                name="plus"
-                size={hp(3.2)}
-                strokeWidth={2}
-                color={colorStyle.primary}
-              />
+              <SquarePlus size={28} color={colorStyle.primary} />
             </Pressable>
             <Pressable
               onPress={() => {

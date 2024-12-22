@@ -3,12 +3,8 @@ import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TextInput,
-  TouchableOpacity,
-  Pressable,
+  ScrollView, TouchableOpacity,
+  Pressable
 } from "react-native";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { useThemeColor } from "@/hooks/useThemeColor";
@@ -19,16 +15,15 @@ import Avatar from "@/components/Avatar";
 import { useAuth } from "@/context/AuthContext";
 import RichTextEditor from "@/components/RichTextEditor";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import Icon from "@/assets/icons";
 import Button from "@/components/Button";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 import { getSupabaseUrl } from "@/services/imageService";
-import { Video } from "expo-av";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEvent } from "expo";
 import Toast from "react-native-toast-message";
 import { createOrUpdatePost } from "@/services/PostService";
+import { ImageIcon, Trash2, VideoIcon } from "lucide-react-native";
 
 const NewPost = () => {
   const post = useLocalSearchParams();
@@ -187,7 +182,7 @@ const NewPost = () => {
               )}
 
               <Pressable style={styles.closeIcon} onPress={() => setFile(null)}>
-                <Icon name="delete" size={20} color="white" />
+                <Trash2 size={20} color={"white"} />
               </Pressable>
             </View>
           )}
@@ -197,10 +192,10 @@ const NewPost = () => {
             <Text style={styles.addImageText}>Add to your Post</Text>
             <View style={styles.mediaIcons}>
               <TouchableOpacity onPress={() => onPick(true)}>
-                <Icon name="image" size={30} color={colorStyle.textLight} />
+                <ImageIcon size={33} color={colorStyle.textLight} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => onPick(false)}>
-                <Icon name="video" size={33} color={colorStyle.textLight} />
+                <VideoIcon size={33} color={colorStyle.textLight} />
               </TouchableOpacity>
             </View>
           </View>

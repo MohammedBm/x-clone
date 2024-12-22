@@ -1,10 +1,7 @@
 import {
-  Alert,
   FlatList,
-  Platform,
   Pressable,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -14,7 +11,6 @@ import { useThemeColor } from "@/hooks/useThemeColor";
 import { useRouter } from "expo-router";
 import Header from "@/components/Header";
 import { hp, wp } from "@/helpers/common";
-import Icon from "@/assets/icons";
 import { colorStyle, radius } from "@/constants/Colors";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -24,6 +20,7 @@ import alert from "@/components/alert";
 import { fetchPosts } from "@/services/PostService";
 import Loading from "@/components/Loading";
 import PostCard from "@/components/PostCard";
+import { LogOut, Mail, Pencil, Phone } from "lucide-react-native";
 
 const POSTS_LIMIT = 10; // Ensure posts limit is defined
 let LIMIT = 0;
@@ -105,8 +102,6 @@ const Profile = () => {
     }
   };
 
-  console.log("posts", posts);
-
   return (
     <ScreenWrapper bg={backgroundColor}>
       <FlatList
@@ -159,7 +154,7 @@ const UserHeader = ({ user, router, logoutHandler }) => {
       <View>
         <Header title="Profile" router={router} mb={30} />
         <TouchableOpacity style={styles.logoutButton} onPress={logoutHandler}>
-          <Icon name="logout" color={colorStyle.rose} />
+          <LogOut size={25} color={colorStyle.rose} />
         </TouchableOpacity>
       </View>
 
@@ -175,7 +170,7 @@ const UserHeader = ({ user, router, logoutHandler }) => {
               style={styles.editIcon}
               onPress={() => router.push("/editProfile")}
             >
-              <Icon name="edit" strokeWidth={2.5} size={20} />
+              <Pencil size={20} color={colorStyle.primary} strokeWidth={1.6} />
             </Pressable>
           </View>
           {/* username and details */}
@@ -189,13 +184,13 @@ const UserHeader = ({ user, router, logoutHandler }) => {
           {/* email, phone, bio */}
           <View style={{ gap: 10 }}>
             <View style={styles.info}>
-              <Icon name="mail" size={20} color={colorStyle.textLight} />
+              <Mail size={20} color={colorStyle.primary} />
               <ThemedText style={styles.infoText}>
                 {(user && user.email) || "No email"}
               </ThemedText>
             </View>
             <View style={styles.info}>
-              <Icon name="call" size={20} color={colorStyle.textLight} />
+              <Phone size={20} color={colorStyle.primary} />
               <ThemedText style={styles.infoText}>
                 {(user && user.phoneNumber) || "No Phone number"}
               </ThemedText>

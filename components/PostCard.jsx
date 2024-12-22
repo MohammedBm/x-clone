@@ -1,24 +1,21 @@
-import {
-  Platform,
-  Share,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { colorStyle, fonts, radius } from "@/constants/Colors";
 import { hp } from "@/helpers/common";
 import Avatar from "./Avatar";
-import { formatDistanceToNowStrict, parseISO, set } from "date-fns";
-import Icon from "@/assets/icons";
+import { formatDistanceToNowStrict, parseISO } from "date-fns";
 import { getSupabaseUrl } from "@/services/imageService";
 import { Image } from "expo-image";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEvent } from "expo";
 import { createPostLike, deletePostLike } from "@/services/PostService";
-import { useRouter } from "expo-router";
-import { Pencil, Trash2 } from "lucide-react-native";
+import {
+  EllipsisIcon,
+  Heart,
+  MessageSquareMore,
+  Pencil,
+  Trash2,
+} from "lucide-react-native";
 import alert from "./alert";
 
 const PostCard = ({
@@ -31,7 +28,6 @@ const PostCard = ({
   onDelete = () => {},
   onEdit = () => {},
 }) => {
-  console.log(item);
   const [likes, setLikes] = useState([]);
   useEffect(() => {
     setLikes(item?.postsLikes || []);
@@ -122,12 +118,7 @@ const PostCard = ({
         </View>
         {showMoreIcons && (
           <TouchableOpacity onPress={openDetails}>
-            <Icon
-              name="threeDotsHorizontal"
-              size={hp(3.5)}
-              strokeWidth={3}
-              color={colorStyle.textDark}
-            />
+            <EllipsisIcon size={20} color={colorStyle.textDark} />
           </TouchableOpacity>
         )}
 
@@ -174,18 +165,17 @@ const PostCard = ({
       <View style={styles.footer}>
         <View style={styles.footerButton}>
           <TouchableOpacity onPress={onLike}>
-            <Icon
-              size={24}
-              name="heart"
+            <Heart
               fill={liked ? colorStyle.primary : "transparent"}
               color={liked ? colorStyle.primary : colorStyle.textLight}
+              size={24}
             />
           </TouchableOpacity>
           <Text style={styles.count}>{likes?.length}</Text>
         </View>
         <View style={styles.footerButton}>
           <TouchableOpacity onPress={openDetails}>
-            <Icon name="comment" size={24} color={colorStyle.textLight} />
+            <MessageSquareMore size={24} color={colorStyle.textLight} />
           </TouchableOpacity>
           <Text style={styles.count}>{item.commentCount || 0}</Text>
         </View>

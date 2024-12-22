@@ -1,9 +1,6 @@
 import React from "react";
-import { StyleSheet, Button } from "react-native";
+import { StyleSheet } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
-import { ThemedText } from "@/components/ThemedText";
-import { router } from "expo-router";
-import { useTheme } from "@/hooks/ThemeContext";
 import Loading from "@/components/Loading";
 
 const Index = () => {
