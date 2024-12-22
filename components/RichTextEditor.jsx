@@ -49,7 +49,7 @@ const RichTextEditor = ({ onChange, placeholder, bodyRef }) => {
           />
         </View>
         {/* Keyboard close button */}
-        {Platform.OS == "web" && (
+        {Platform.OS !== "web" && (
           <TouchableOpacity
             onPress={hideKeyboard}
             style={styles.keyboardCloseButton}
