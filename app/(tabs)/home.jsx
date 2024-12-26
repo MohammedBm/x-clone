@@ -13,8 +13,8 @@ import PostCard from "@/components/PostCard";
 import Loading from "@/components/Loading";
 import { supabase } from "@/lib/supabase";
 import { getUserData } from "@/services/userService";
-import { SquarePlus } from "lucide-react-native";
-
+import { Feather, SquarePlus } from "lucide-react-native";
+import { FAB } from "@rneui/themed";
 const POSTS_LIMIT = 10; // Number of posts per fetch
 
 const Home = () => {
@@ -166,9 +166,6 @@ const Home = () => {
         <View style={styles.header}>
           <ThemedText style={styles.title}>Home</ThemedText>
           <View style={styles.icons}>
-            <Pressable onPress={() => router.push("/newPost")}>
-              <SquarePlus size={28} color={colorStyle.primary} />
-            </Pressable>
             <Pressable
               onPress={() => {
                 router.push("/profile");
@@ -215,6 +212,17 @@ const Home = () => {
           />
         </View>
       </View>
+
+      <FAB
+        style={{
+          position: "absolute",
+          bottom: hp(3),
+          right: wp(4),
+        }}
+        color={colorStyle.primary}
+        icon={<Feather size={28} color={"white"} />}
+        onPress={() => router.push("/newPost")}
+      />
     </ScreenWrapper>
   );
 };
